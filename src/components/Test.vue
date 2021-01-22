@@ -1,11 +1,6 @@
 <template>
   <div class="demo-image">
-    <img
-      id="verification"
-      src="http://localhost:8088/defaultKaptcha"
-      style="cursor: pointer"
-      title="看不清？换一张"
-    />
+    
   </div>
 </template>
 
@@ -16,14 +11,17 @@ export default {
   data() {
     return {
       fits: ["fill", "contain", "cover", "none", "scale-down"],
+      aa:0
     };
+  },
+  mounted:function(){
+    for(var i=0;i<4;i++){
+      console.log(i);
+      this.aa = i;
+      console.log(this.aa);
+    }
   },
 };
 
-$(function () {
-    // 刷新验证码
-    $("#verification").bind("click", function () {
-        $(this).hide().attr('src', 'http://localhost:8088/defaultKaptcha?random=' + Math.random()).fadeIn();
-    });
-});
+
 </script>
