@@ -5,69 +5,126 @@
         <myMenu ref="myMenu"></myMenu>
       </el-header>
       <el-main>
-          <el-col :span="9">
+        <el-col :span="8">
           <el-card class="flight">
             <div id="cardHead">当前航班</div>
             <p></p>
-            <span>航班名称：{{ curFlight.fName }}</span><br/>
-            <span>飞机型号：{{ curFlight.pName }}</span><br/>
-            <span>出发时间：{{ curFlight.startTime }}</span><br/>
-            <span>预计抵达时间：{{ curFlight.endTime }}</span><br/>
-            <span>出发地：{{ curFlight.from }}</span><br/>
-            <span>目的地：{{ curFlight.destination }}</span><br/>
+            <span>航班名称：{{ curFlight.fName }}</span
+            ><br />
+            <span>飞机型号：{{ curFlight.pName }}</span
+            ><br />
+            <span>出发时间：{{ curFlight.startTime }}</span
+            ><br />
+            <span>预计抵达时间：{{ curFlight.endTime }}</span
+            ><br />
+            <span>出发地：{{ curFlight.from }}</span
+            ><br />
+            <span>目的地：{{ curFlight.destination }}</span
+            ><br />
             <p></p>
             <a id="backLink" href="javascript:history.go(-1)">重选航班</a>
           </el-card>
-          <br/>
-          <el-table :data="passengers" stripe height="350px" broder id="passTable">
-                <el-table-column label="可选乘客列表" align="center">
-            <el-table-column prop="pIdnum" label="身份证号" width="180">
+          <br />
+          <el-table
+            :data="passengers"
+            stripe
+            height="350px"
+            broder
+            id="passTable"
+          >
+            <el-table-column label="可选乘客列表" align="center">
+              <el-table-column prop="pIdnum" label="身份证号" width="180">
+              </el-table-column>
+              <el-table-column prop="pRealname" label="真实姓名" width="120">
+              </el-table-column>
+              <el-table-column label="操作" width="120px">
+                <template slot-scope="scope">
+                  <el-button
+                    size="medium"
+                    type="primary"
+                    @click="addPassenger2List(scope.row)"
+                    plain
+                    >加入乘客</el-button
+                  >
+                </template>
+              </el-table-column>
             </el-table-column>
-            <el-table-column prop="pRealname" label="真实姓名" width="120">
-            </el-table-column>
-            <el-table-column label="操作" width="120px">
-              <template slot-scope="scope">
-                <el-button size="medium" type="primary" @click="addPassenger2List(scope.row)" plain>加入乘客</el-button>
-              </template>
-            </el-table-column>
-                </el-table-column>
           </el-table>
-          </el-col>
-          <el-col :span="15">
-              <el-button type="primary" style="margin-left:85%;" @click="addPassDialog = true">添加新乘客</el-button>
-                <el-table :data="curPassenger" stripe height="600px" border id="curPass">
-                <el-table-column align="center" label="已选乘客列表">
-            <el-table-column prop="pIdnum" label="身份证号" width="180">
-            </el-table-column>
-            <el-table-column prop="pRealname" label="真实姓名" width="120">
-            </el-table-column>
-            <el-table-column label="机票类型" width="120px">
-              <template slot-scope="scope">
-                <el-select v-model="curTicket[scope.$index]" @change="updatePrice(scope.$index)">
-                    <el-option v-for="item in options" :key="item.tId" :label="item.tName" :value="item.tId">
+        </el-col>
+        <el-col :span="15">
+          <el-row>
+            <div style="margin-left:60%">
+              <el-button id="myself" @click="addMyself()">添加自己</el-button>
+              <el-button type="primary" @click="addPassDialog = true">添加新乘客</el-button>
+            </div>
+          </el-row>
+          <el-table
+            :data="curPassenger"
+            stripe
+            height="600px"
+            border
+            id="curPass"
+          >
+            <el-table-column align="center" label="已选乘客列表">
+              <el-table-column prop="pIdnum" label="身份证号" width="180">
+              </el-table-column>
+              <el-table-column prop="pRealname" label="真实姓名" width="120">
+              </el-table-column>
+              <el-table-column label="机票类型" width="120px">
+                <template slot-scope="scope">
+                  <el-select
+                    v-model="curTicket[scope.$index]"
+                    @change="updatePrice(scope.$index)"
+                  >
+                    <el-option
+                      v-for="item in options"
+                      :key="item.tId"
+                      :label="item.tName"
+                      :value="item.tId"
+                    >
                     </el-option>
-                </el-select>
-              </template>
+                  </el-select>
+                </template>
+              </el-table-column>
+              <el-table-column label="单价" prop="tPrice"> </el-table-column>
+              <el-table-column label="操作" width="120px">
+                <template slot-scope="scope">
+                  <el-button
+                    size="medium"
+                    type="danger"
+                    @click="delCurPass(scope.row, scope.$index)"
+                    plain
+                    >删除</el-button
+                  >
+                </template>
+              </el-table-column>
             </el-table-column>
-            <el-table-column label="单价" prop="tPrice">
-            </el-table-column>
-            <el-table-column label="操作" width="120px">
-              <template slot-scope="scope">
-                <el-button size="medium" type="danger" @click="delCurPass(scope.row,scope.$index)" plain>删除</el-button>
-              </template>
-            </el-table-column>
-                </el-table-column>
           </el-table>
-          </el-col>
+        </el-col>
       </el-main>
-      {{curTicket}}
+      {{ curTicket }}
       <div class="footer">
-        <div class="pay"><span>乘客共有 <span style="color:blue">{{curPassenger.length}}</span> 人，总计金额为<span style="color:red">￥{{priceSum}}  </span></span>
-            <el-button round type="warning" @click="createOrder()">创建订单</el-button></div>
+        <div class="pay">
+          <span
+            >乘客共有
+            <span style="color: blue">{{ curPassenger.length }}</span>
+            人，总计金额为<span style="color: red"
+              >￥{{ priceSum }}
+            </span></span
+          >
+          <el-button round type="warning" @click="createOrder()"
+            >创建订单</el-button
+          >
+        </div>
       </div>
     </el-container>
-{{orderItem}}
-    <el-dialog title="乘客新增" :visible.sync="addPassDialog" width="30%" center>
+    {{ orderItem }}
+    <el-dialog
+      title="乘客新增"
+      :visible.sync="addPassDialog"
+      width="30%"
+      center
+    >
       <span slot="footer" class="dialog-footer">
         <el-form ref="newPass" :model="newPass" :rules="passRule">
           <el-form-item label="真实姓名" prop="pRealname">
@@ -81,7 +138,6 @@
         <el-button type="primary" @click="addPass('newPass')">保 存</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 <script>
@@ -93,8 +149,8 @@ export default {
   name: "Order",
   components: { myMenu: myMenu },
   data() {
-      const sums = [];
-      var validIdnum = (rule, value, callback) => {
+    const sums = [];
+    var validIdnum = (rule, value, callback) => {
       if (value == null || value.trim() === "") {
         callback(new Error("请输入身份证号"));
       } else {
@@ -117,48 +173,54 @@ export default {
         destination: null,
       },
       passengers: [],
-      idnums:[],
-      addPassDialog:false,
+      idnums: [],
+      addPassDialog: false,
       newPass: {
         pIdnum: null,
         pRealname: null,
         uId: null,
       },
-      priceSum:0,
+      priceSum: 0,
       passRule: {
         pIdnum: [{ required: true, validator: validIdnum, trigger: "blur" }],
         pRealname: [
           { required: true, message: "请输入真实姓名", trigger: "blur" },
         ],
       },
-      curPassenger:[],
-      options:[{
-          tName:"经济舱",
-          tId:1,
-          tPrice:0
+      curPassenger: [],
+      options: [
+        {
+          tName: "经济舱",
+          tId: 1,
+          tPrice: 0,
+        },
+        {
+          tName: "商务舱",
+          tId: 2,
+          tPrice: 0,
+        },
+        {
+          tName: "头等舱",
+          tId: 3,
+          tPrice: 0,
+        },
+      ],
+      curTicket: [],
+      newOrder: {
+        uId: null,
+        totalPrice: 0,
       },
-      {
-          tName:"商务舱",
-          tId:2,
-          tPrice:0
-      },
-      {
-          tName:"头等舱",
-          tId:3,
-          tPrice:0
-      }],
-      curTicket:[],
-      newOrder:{
-        uId:null,
-        totalPrice:0
-      },
-      orderItem:{
-        oid:null,
-        tid:null,
-        uid:null,
-        idnum:null,
+      mine:{
+        pIdnum:null,
         pRealname:null
-      }
+      },
+      orderItem: {
+        oid: null,
+        tid: null,
+        uid: null,
+        idnum: null,
+        realName: null,
+      },
     };
   },
   mounted: function () {
@@ -229,25 +291,24 @@ export default {
       });
     },
 
-    getUserInfo:function(){
-        var that = this;
-        $.ajax({
+    getUserInfo: function () {
+      var that = this;
+      $.ajax({
         type: "GET",
         dataType: "json",
         headers: {
           token: localStorage.token,
-          account: localStorage.account
+          account: localStorage.account,
         },
-        url: process.env.VUE_APP_API_URL +"/getUserByAccount",
+        url: process.env.VUE_APP_API_URL + "/getUserByAccount",
         success: function (result) {
           if (result.code == 200) {
             that.curPassenger = [];
-            result.data.pIdnum = result.data.uIdnum;
-            result.data.pRealname = result.data.uRealname;
-            that.curPassenger.push(result.data);
-          }
-          else{
-              that.alertHelper(result.msg,"error");
+            that.mine.pIdnum = result.data.uIdnum;
+            that.mine.pRealname = result.data.uRealname;
+            that.curPassenger.push(that.mine);
+          } else {
+            that.alertHelper(result.msg, "error");
           }
         },
         error: function () {
@@ -256,28 +317,31 @@ export default {
       });
     },
 
-    getTicketInfo:function(){
-        var that = this;
-        $.ajax({
+    getTicketInfo: function () {
+      var that = this;
+      $.ajax({
         type: "GET",
         dataType: "json",
         headers: {
           token: localStorage.token,
         },
-        url: process.env.VUE_APP_API_URL +"/getTicketsByFid?fid="+that.curFlight.fId,
+        url:
+          process.env.VUE_APP_API_URL +
+          "/getTicketsByFid?fid=" +
+          that.curFlight.fId,
         success: function (result) {
           if (result.code == 200) {
-            for(var i=0;i<3;i++){
-                that.options[result.data[i].rank-1].tId = result.data[i].tId;
-                that.options[result.data[i].rank-1].tPrice = result.data[i].tPrice;
+            for (var i = 0; i < 3; i++) {
+              that.options[result.data[i].rank - 1].tId = result.data[i].tId;
+              that.options[result.data[i].rank - 1].tPrice =
+                result.data[i].tPrice;
             }
             that.curTicket[0] = result.data[0].tId;
             that.curPassenger[0].tPrice = 0;
             that.curPassenger[0].tPrice = result.data[0].tPrice;
             that.priceSum = result.data[0].tPrice;
-          }
-          else{
-              that.alertHelper(result.msg,"error");
+          } else {
+            that.alertHelper(result.msg, "error");
           }
         },
         error: function () {
@@ -361,41 +425,51 @@ export default {
       });
     },
 
-    addPassenger2List:function(newData){
-        if(this.curPassenger.indexOf(newData)!=-1){
-            this.alertHelper("您已添加该乘客","warning");
-            return;
-        }
-        this.curPassenger.push(newData);
-        this.curTicket[this.curPassenger.length-1]=this.options[0].tId;
-        this.curPassenger[this.curPassenger.length-1].tPrice=this.options[0].tPrice;
+    addPassenger2List: function (newData) {
+      if (this.curPassenger.indexOf(newData) != -1) {
+        this.alertHelper("您已添加该乘客", "warning");
+        return;
+      }
+      this.curPassenger.push(newData);
+      this.curTicket[this.curPassenger.length - 1] = this.options[0].tId;
+      this.curPassenger[this.curPassenger.length - 1].tPrice = this.options[0].tPrice;
+      this.getPriceSum();
+    },
+
+    addMyself:function(){
+      if (this.curPassenger.indexOf(this.mine) != -1) {
+        this.alertHelper("您已在乘客列表", "warning");
+        return;
+      }
+      this.curPassenger.push(this.mine);
+      this.curTicket[this.curPassenger.length - 1] = this.options[0].tId;
+      this.curPassenger[this.curPassenger.length - 1].tPrice = this.options[0].tPrice;
+      this.getPriceSum();
+    },
+
+    delCurPass: function (target, pIndex) {
+      var index = this.curPassenger.indexOf(target);
+      if (index != -1) {
+        this.curPassenger.splice(index, 1);
+        this.curTicket.splice(pIndex, 1);
         this.getPriceSum();
+      }
     },
 
-    delCurPass:function(target,pIndex){
-        var index = this.curPassenger.indexOf(target);
-        if(index!=-1){
-            this.curPassenger.splice(index,1);
-            this.curTicket.splice(pIndex,1);
-            this.getPriceSum();
+    updatePrice: function (index) {
+      var tid = this.curTicket[index];
+      for (var i = 0; i < 3; i++) {
+        if (this.options[i].tId == tid) {
+          this.curPassenger[index].tPrice = this.options[i].tPrice;
+          this.getPriceSum();
+          break;
         }
+      }
     },
 
-    updatePrice:function(index){
-        var tid = this.curTicket[index];
-        for(var i=0;i<3;i++){
-            if(this.options[i].tId==tid){
-                this.curPassenger[index].tPrice = this.options[i].tPrice;
-                this.getPriceSum();
-                break;
-            }
-        }
-    },
-
-    getPriceSum:function(){
+    getPriceSum: function () {
       this.priceSum = 0;
-      console.log("aaaaaaaas");
-      for(var i=0; i<this.curPassenger.length;i++){
+      for (var i = 0; i < this.curPassenger.length; i++) {
         this.priceSum += this.curPassenger[i].tPrice;
       }
     },
@@ -412,21 +486,17 @@ export default {
       var h =
         (date.getHours() < 10 ? "0" + date.getHours() : date.getHours()) + ":";
       var m =
-        (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()) +
-        ":";
-      var s =
-        date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
-      return Y + M + D + h + m + s;
+        (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes());
+      return Y + M + D + h + m;
     },
 
-    createOrder:function(){
+    createOrder: function () {
       if (localStorage.userId == null) {
-      this.alertHelper("登录信息失效，请重新登录", "error");
-      setTimeout(function () {
-        window.location.href = "/#/login";
+        this.alertHelper("登录信息失效，请重新登录", "error");
+        setTimeout(function () {
+          window.location.href = "/#/login";
         }, 2000);
-      }
-      else{
+      } else {
         this.newOrder.uId = localStorage.userId;
         var that = this;
         $.ajax({
@@ -439,21 +509,20 @@ export default {
           },
           url: process.env.VUE_APP_API_URL + "/addOrder",
           data: JSON.stringify(that.newOrder),
-          success:function(result){
-            if(result.code == 101){
-              that.alertHelper(result.msg,"error");
-            }
-            else if(result.code == 200){
+          success: function (result) {
+            if (result.code == 101) {
+              that.alertHelper(result.msg, "error");
+            } else if (result.code == 200) {
               /**
                * 获取新增订单的id
                */
               var newOid = result.data;
-              
-              for(var i=0; i<that.curPassenger.length; i++){
+
+              for (var i = 0; i < that.curPassenger.length; i++) {
                 that.orderItem.oid = newOid;
                 that.orderItem.uid = localStorage.userId;
                 that.orderItem.tid = that.curTicket[i];
-                that.orderItem.pRealname = that.curPassenger[i].pRealname;
+                that.orderItem.realName = that.curPassenger[i].pRealname;
                 that.orderItem.idnum = that.curPassenger[i].pIdnum;
                 /**
                  * 添加订单项
@@ -464,19 +533,22 @@ export default {
                * 添加订单项完毕后，更新订单总额
                */
               that.updateTotalPrice(newOid);
+              that.alertHelper("创建订单成功", "success");
+              setTimeout(function () {
+                window.location.href = "/#/orderList?type=unfinished";
+              }, 2000);
             }
           },
-          error:function(err){
-            that.alertHelper("创建订单异常","error");
-          }
+          error: function (err) {
+            that.alertHelper("创建订单异常", "error");
+          },
         });
-
       }
     },
 
-    addOrderItem:function(){
+    addOrderItem: function () {
       var that = this;
-      if(that.orderItem.oid!=null&&that.orderItem.tid!=null){
+      if (that.orderItem.oid != null && that.orderItem.tid != null) {
         $.ajax({
           type: "POST",
           dataType: "json",
@@ -487,27 +559,23 @@ export default {
           },
           url: process.env.VUE_APP_API_URL + "/addItem",
           data: JSON.stringify(that.orderItem),
-          success:function(result){
-            console.log(result);
+          success: function (result) {},
+          error: function (err) {
+            that.alertHelper("创建子订单异常" + that.orderItem, "error");
           },
-          error:function(err){
-            that.alertHelper("创建子订单异常"+that.orderItem,"error");
-          }
         });
       }
-      
     },
 
-    updateTotalPrice:function(oid){
+    updateTotalPrice: function (oid) {
       $.ajax({
         type: "GET",
         dataType: "json",
         headers: {
           token: localStorage.token,
         },
-        url:process.env.VUE_APP_API_URL + "/updateTotalPrice?oid=" + oid,
-        success: function (result) {
-        }
+        url: process.env.VUE_APP_API_URL + "/updateTotalPrice?oid=" + oid,
+        success: function (result) {},
       });
     },
   },
@@ -517,6 +585,14 @@ export default {
 <style>
 .flight {
   width: 95%;
+}
+#myself {
+  color: blue;
+  background: #ffff99;
+}
+#myself:hover{
+  color: #ff3399;
+  background: #009933;
 }
 #cardHead {
   margin-left: 20%;
@@ -530,25 +606,25 @@ export default {
 #backLink:hover {
   color: rgb(219, 0, 0);
 }
-#passTable{
-  width: 95%;
+#passTable {
+  width: 90%;
 }
-#curPass{
-    width:622px;
-    margin-left:17%;
-    height:500px;
+#curPass {
+  width: 622px;
+  margin-left: 17%;
+  height: 500px;
 }
-.footer{
-    position: fixed;
-    background-color: rgb(195, 241, 255);
-    top:93%;
-    height:16%;
-    width:100%;
-    z-index:99990;
+.footer {
+  position: fixed;
+  background-color: rgb(195, 241, 255);
+  top: 94%;
+  height: 16%;
+  width: 100%;
+  z-index: 99990;
 }
-.pay{
+.pay {
   position: relative;
-  left:71%;
-  z-index:99999;
+  left: 76%;
+  z-index: 99999;
 }
 </style>

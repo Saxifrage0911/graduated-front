@@ -20,11 +20,11 @@
       <i class="el-icon-star-on"></i>
       <span>我的订单</span>
     </template>
-    <el-badge :value="12" class="item" type="primary">
-    <el-menu-item index="2-1">已完成订单</el-menu-item>
+    <el-badge :value="fOrderCount" class="item" type="primary">
+    <el-menu-item index="2-1" @click="toFOrderList()">已完成订单</el-menu-item>
     </el-badge>
-    <el-badge :value="12" class="item">
-    <el-menu-item index="2-2">未完成订单</el-menu-item>
+    <el-badge :value="ufOrderCount" class="item">
+    <el-menu-item index="2-2" @click="toUFOrderList()">未完成订单</el-menu-item>
     </el-badge>
   </el-submenu>
   <el-menu-item index="4" @click="toUpdate()">
@@ -76,7 +76,9 @@ export default {
       activeIndex: '1',
       isLogout:true,
       isLogin:false,
-      cur_account:null
+      cur_account:null,
+      fOrderCount:0,
+      ufOrderCount:0,
     };
   },
   mounted:function(){
@@ -88,6 +90,7 @@ export default {
       this.isLogin = false;
       this.isLogout = true;;
     }
+    this.getOrderCount();
   },
   methods: {
     toHome:function(){
@@ -98,6 +101,32 @@ export default {
     },
     toUpdate:function(){
       window.location.href="/#/update";
+    },
+    toFOrderList:function(){
+      window.location.href="/#/orderList?type=finished";
+    },
+    toUFOrderList:function(){
+      window.location.href="/#/orderList?type=unfinished";
+    },
+    getOrderCount:function(){
+      var that = this;
+      $.ajax({
+        type: "GET",
+        dataType: "json",
+        headers:{
+          'token':localStorage.token
+        },
+        url: process.env.VUE_APP_API_URL + "/getOrderCount?uid="+localStorage.userId,
+        success:function(result){
+          if(result.code==200){
+            that.fOrderCount = result.data.numOfFinished;
+            that.ufOrderCount = result.data.numOfUnfinished;
+          }
+        },
+        error:function(err){
+
+        }
+      });
     },
     toLogin:function(){
       window.location.href="/#/login";
@@ -123,7 +152,7 @@ export default {
             type: "GET",
             dataType: "json",
             headers:{
-            'token':localStorage.token
+              'token':localStorage.token
             },
             url: process.env.VUE_APP_API_URL + "/logout",
             success:function(result){

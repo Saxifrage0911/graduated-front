@@ -426,7 +426,7 @@ export default {
   position: absolute;
   margin-top: 0%;
   margin-left: 2%;
-  width:45%
+  width:40%
 }
 #passTable{
   width: 100%;

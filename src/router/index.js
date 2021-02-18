@@ -8,6 +8,7 @@ import Login from '@/components/Login'
 import Registry from '@/components/Registry'
 import Flight from '@/components/Flight'
 import Order from '@/components/Order'
+import OrderList from '@/components/OrderList'
 
 Vue.use(Router)
 
@@ -52,6 +53,11 @@ export default new Router({
       path: '/order',
       name: 'Order',
       component: Order
+    },
+    {
+      path: '/orderList',
+      name: 'OrderList',
+      component: OrderList
     }
   ]
 })
