@@ -40,13 +40,13 @@
               <el-table-column prop="from" label="出发地"> </el-table-column>
               <el-table-column prop="destination" label="目的地">
               </el-table-column>
-              <el-table-column prop="startTime" label="出发时间">
+              <el-table-column prop="startTime" width="180" label="出发时间">
               </el-table-column>
-              <el-table-column prop="endTime" label="预计抵达时间">
+              <el-table-column prop="endTime" width="180" label="预计抵达时间">
               </el-table-column>
-              <el-table-column prop="createTime" label="订单创建时间">
+              <el-table-column prop="createTime" width="180" label="订单创建时间">
               </el-table-column>
-              <el-table-column prop="payTime" label="支付时间">
+              <el-table-column prop="payTime" width="180" label="支付时间">
               </el-table-column>
               <el-table-column prop="totalPrice" label="总金额">
               </el-table-column>
@@ -65,6 +65,14 @@
                 </template>
               </el-table-column>
             </el-table>
+            <el-pagination
+              background
+              :current-page="curFP"
+              @current-change="getFinishedOrderList"
+              layout="prev, pager, next"
+              :total="numOfFinished"
+            >
+            </el-pagination>
           </el-tab-pane>
           <el-tab-pane label="未完成订单" name="unfinished">
             <el-table :data="unfinishedList" stripe border style="width: 100%">
@@ -149,6 +157,14 @@
                 </template>
               </el-table-column>
             </el-table>
+            <el-pagination
+              background
+              :current-page="curUP"
+              @current-change="getUnfinishedOrderList"
+              layout="prev, pager, next"
+              :total="numOfUnfinished"
+            >
+            </el-pagination>
           </el-tab-pane>
         </el-tabs>
       </el-main>
@@ -167,6 +183,10 @@ export default {
     return {
       activeName: "finished",
       finishedList: [],
+      numOfFinished:0,
+      numOfUnfinished:0,
+      curFP:1,
+      curUP:1,
       unfinishedList: [],
       overdue: "",
       createTime: "",
@@ -177,8 +197,9 @@ export default {
     var url = location.href;
     var index = url.indexOf("type") + 5;
     this.activeName = url.substring(index);
-    this.getFinishedOrderList();
-    this.getUnfinishedOrderList();
+    this.getFinishedOrderList(1);
+    this.getUnfinishedOrderList(1);
+    this.getNumOfOrder();
   },
   methods: {
     alertHelper(msg, mType) {
@@ -188,7 +209,7 @@ export default {
       });
     },
 
-    getFinishedOrderList: function () {
+    getNumOfOrder:function(){
       var that = this;
       $.ajax({
         type: "GET",
@@ -197,7 +218,31 @@ export default {
           token: localStorage.token,
         },
         url:
-          process.env.VUE_APP_API_URL + "/getFOrder?uid=" + localStorage.userId,
+          process.env.VUE_APP_API_URL + "/getOrderCount?uid=" + localStorage.userId,
+        success: function (result) {
+          if (result.code == 200) {
+            that.numOfFinished = result.data.numOfFinished;
+            that.numOfUnfinished = result.data.numOfUnfinished;
+          } else {
+            that.alertHelper(result.msg, "error");
+          }
+        },
+        error: function (err) {
+          that.alertHelper("系统内部异常，请稍后重试", "error");
+        },
+      });
+    },
+
+    getFinishedOrderList: function (val) {
+      var that = this;
+      $.ajax({
+        type: "GET",
+        dataType: "json",
+        headers: {
+          token: localStorage.token,
+        },
+        url:
+          process.env.VUE_APP_API_URL + "/getFOrder?uid=" + localStorage.userId+"&pageNo="+val+"&pageSize=10",
         success: function (result) {
           if (result.code == 200) {
             that.finishedList = result.data;
@@ -211,7 +256,7 @@ export default {
       });
     },
 
-    getUnfinishedOrderList: function () {
+    getUnfinishedOrderList: function (val) {
       var that = this;
       $.ajax({
         type: "GET",
@@ -220,7 +265,7 @@ export default {
           token: localStorage.token,
         },
         url:
-          process.env.VUE_APP_API_URL + "/getUOrder?uid=" + localStorage.userId,
+          process.env.VUE_APP_API_URL + "/getUOrder?uid=" + localStorage.userId+"&pageNo="+val+"&pageSize=10",
         success: function (result) {
           if (result.code == 200) {
             that.unfinishedList = result.data;
@@ -246,8 +291,8 @@ export default {
         success: function (result) {
           if (result.code == 200) {
             that.alertHelper("支付成功", "success");
-            that.getFinishedOrderList();
-            that.getUnfinishedOrderList();
+            that.getFinishedOrderList(1);
+            that.getUnfinishedOrderList(1);
           } else {
             that.alertHelper(result.msg, "error");
           }
@@ -270,8 +315,8 @@ export default {
         success: function (result) {
           if (result.code == 200) {
             that.alertHelper("订单取消成功", "success");
-            that.getFinishedOrderList();
-            that.getUnfinishedOrderList();
+            that.getFinishedOrderList(1);
+            that.getUnfinishedOrderList(1);
           } else {
             that.alertHelper(result.msg, "error");
           }
@@ -318,6 +363,26 @@ export default {
 };
 </script>
 <style>
+.el-table th.gutter{
+    display: table-cell!important;
+ }
+.tableTitle {
+  position: relative;
+  margin: 0 auto;
+  width: 600px;
+  height: 1px;
+  background-color: #d4d4d4;
+  text-align: center;
+  font-size: 16px;
+  color: rgba(101, 101, 101, 1);
+}
+.midText {
+  position: absolute;
+  left: 50%;
+  background-color: #ffffff;
+  padding: 0 15px;
+  transform: translateX(-50%) translateY(-50%);
+}
 .demo-table-expand {
   font-size: 0;
 }

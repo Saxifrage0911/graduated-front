@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-container>
-      <el-aside width="600px">
+      <el-aside width="800px">
         <div class="block">
           <el-carousel height="650px" indicator-position="outside">
             <el-carousel-item

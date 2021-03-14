@@ -108,6 +108,7 @@ export default {
 .bac {
   background-image: url("../assets/plane4.jpg");
   background-repeat:no-repeat;
+  height: 672px;
   background-size:100% 100%;
 }
 .text {

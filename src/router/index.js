@@ -15,11 +15,6 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/',
-      name: 'Add',
-      component: Add
-    },
-    {
       path: '/search',
       name: 'Search',
       component: Search
@@ -36,6 +31,11 @@ export default new Router({
     },
     {
       path: '/login',
+      name: 'Login',
+      component: Login
+    },
+    {
+      path:'/',
       name: 'Login',
       component: Login
     },
